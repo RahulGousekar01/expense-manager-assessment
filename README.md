@@ -1,36 +1,115 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Expense Manager — React Frontend Assessment
+
+A multi-subsidiary expense tracking application built with Next.js, React, Redux Toolkit, and Ant Design. Organizations can manage multiple subsidiaries, each recording expenses in their own currency, with consolidated reporting in the base currency.
+
+---
+
+## Tech Stack
+
+- **Framework:** Next.js 14 (App Router)
+- **Language:** TypeScript
+- **State Management:** Redux Toolkit
+- **UI Library:** Ant Design
+- **Styling:** Tailwind CSS v4
+- **Currency API:** [open.er-api.com](https://open.er-api.com)
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- npm or yarn
+
+### Installation
+
+```bash
+git clone <your-repo-url>
+cd <project-folder>
+npm install
+```
+
+### Run Locally
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## How to Use
 
-## Learn More
+### 1. Create an Organization
+On the home screen, enter your organization name and select a base currency (e.g. USD). This is the currency all expenses will be consolidated into on the dashboard.
 
-To learn more about Next.js, take a look at the following resources:
+### 2. Add Subsidiaries
+Navigate to **Subsidiaries** from the header. Click **Add Subsidiary** and provide a name and default currency (e.g. INR, AED, EUR).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 3. Access a Subsidiary
+Click **View Expenses →** next to any subsidiary. You will be prompted for a password.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+> **Default subsidiary password:** `sub@1234`
 
-## Deploy on Vercel
+### 4. Manage Expenses
+Inside a subsidiary, you can:
+- **Add** a new expense — the live exchange rate is fetched at the time of creation and stored with the expense
+- **Edit** an existing expense — updates name, category, amount, date, and notes without recalculating the exchange rate
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 5. Dashboard
+The dashboard shows:
+- Total consolidated expenses in the base currency
+- Per-subsidiary expense totals in their own currency
+- Expense breakdown by category in the base currency
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Architecture Decisions
+
+### State Management — Redux Toolkit
+All application state (organization, subsidiaries, expenses) is managed via Redux Toolkit with separate slices. Business logic such as currency conversion and category aggregation is kept in `utils/currencyUtils.ts`, separate from UI components.
+
+### LocalStorage Persistence
+State is persisted to `localStorage` via `store.subscribe()` and rehydrated on page load using `loadState()`. This means data survives page refreshes without a backend.
+
+### Exchange Rate Handling
+Exchange rates are fetched live from `open.er-api.com` when an expense is created, and stored on the expense record itself. Editing an expense does **not** re-fetch or recalculate the rate — preserving the historical rate at the time of entry, as required.
+
+### Subsidiary Login Simulation
+Each subsidiary is protected by a simple password prompt before accessing its expenses. The default password is `sub@1234` and is documented here for assessment purposes.
+
+### Project Structure
+
+```
+app/
+  page.tsx                  # Organization setup (home)
+  dashboard/page.tsx        # Organization dashboard
+  subsidiaries/page.tsx     # Subsidiary list
+  expenses/[subsidiaryId]/  # Expense management per subsidiary
+components/
+  AppLayout.tsx             # Shared header + layout
+  AddSubsidiaryModal.tsx    # Create subsidiary
+  SubsidiaryLoginModal.tsx  # Login simulation
+  AddExpenseModal.tsx       # Add / edit expense
+features/
+  organization/             # Redux slice
+  subsidiaries/             # Redux slice
+  expenses/                 # Redux slice
+services/
+  exchangeRateService.ts    # Exchange rate API
+utils/
+  currencyUtils.ts          # Conversion + aggregation logic
+  storage.ts                # LocalStorage helpers
+store/
+  store.ts                  # Redux store configuration
+```
+
+---
+
+## Notes
+
+- No backend or database is required — all data is stored in `localStorage`
+- The exchange rate API is public and free with no key required
+- If the exchange rate API is unavailable, the app falls back to a rate of `1` and shows an error in the modal
