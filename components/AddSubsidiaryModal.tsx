@@ -15,48 +15,60 @@ export default function AddSubsidiaryModal({ open, onClose }: Props) {
   const [form] = Form.useForm();
 
   const onFinish = (values: Omit<Subsidiary, "id">) => {
-    const newSubsidiary: Subsidiary = {
-      id: Date.now().toString(),
-      ...values,
-    };
-
-    dispatch(addSubsidiary(newSubsidiary));
-
+    dispatch(addSubsidiary({ id: Date.now().toString(), ...values }));
     form.resetFields();
     onClose();
   };
 
   return (
     <Modal
-      title="Add Subsidiary"
+      title={
+        <span className="text-base font-semibold text-gray-900">
+          Add Subsidiary
+        </span>
+      }
       open={open}
       onCancel={onClose}
       onOk={() => form.submit()}
+      okText="Add Subsidiary"
+      okButtonProps={{
+        style: { backgroundColor: "#1D6A6A", borderColor: "#1D6A6A" },
+      }}
+      width={440}
     >
-      <Form form={form} layout="vertical" onFinish={onFinish}>
-        <Form.Item
-          label="Subsidiary Name"
-          name="name"
-          rules={[{ required: true, message: "Enter subsidiary name" }]}
+      <div className="py-2">
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={onFinish}
+          requiredMark={false}
         >
-          <Input placeholder="Enter name" />
-        </Form.Item>
+          <Form.Item
+            label="Subsidiary Name"
+            name="name"
+            rules={[{ required: true, message: "Please enter a name" }]}
+          >
+            <Input placeholder="e.g. Acme India Pvt Ltd" size="large" />
+          </Form.Item>
 
-        <Form.Item
-          label="Default Currency"
-          name="currency"
-          rules={[{ required: true }]}
-        >
-          <Select
-            options={[
-              { label: "INR", value: "INR" },
-              { label: "USD", value: "USD" },
-              { label: "EUR", value: "EUR" },
-              { label: "AED", value: "AED" },
-            ]}
-          />
-        </Form.Item>
-      </Form>
+          <Form.Item
+            label="Default Currency"
+            name="currency"
+            rules={[{ required: true, message: "Please select a currency" }]}
+          >
+            <Select
+              size="large"
+              placeholder="Select currency"
+              options={[
+                { label: "INR — Indian Rupee", value: "INR" },
+                { label: "USD — US Dollar", value: "USD" },
+                { label: "EUR — Euro", value: "EUR" },
+                { label: "AED — UAE Dirham", value: "AED" },
+              ]}
+            />
+          </Form.Item>
+        </Form>
+      </div>
     </Modal>
   );
 }

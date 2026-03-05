@@ -1,7 +1,3 @@
-//this slice will store the expenses of the organization.
-// Each expense will have a description, amount, date, and the subsidiary it belongs to.
-// This will help in tracking and managing expenses effectively.
-
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Expense } from "../../types/models";
 
@@ -20,8 +16,18 @@ const expenseSlice = createSlice({
     addExpense(state, action: PayloadAction<Expense>) {
       state.expenses.push(action.payload);
     },
+    updateExpense(state, action: PayloadAction<Expense>) {
+      const index = state.expenses.findIndex((e) => e.id === action.payload.id);
+      if (index !== -1) {
+        // preserve the original exchangeRate — do not recalculate
+        state.expenses[index] = {
+          ...action.payload,
+          exchangeRate: state.expenses[index].exchangeRate,
+        };
+      }
+    },
   },
 });
 
-export const { addExpense } = expenseSlice.actions;
+export const { addExpense, updateExpense } = expenseSlice.actions;
 export default expenseSlice.reducer;

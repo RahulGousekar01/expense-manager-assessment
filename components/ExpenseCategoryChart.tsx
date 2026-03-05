@@ -1,31 +1,62 @@
 "use client";
 
-import { PieChart, Pie, Tooltip, Cell, ResponsiveContainer } from "recharts";
+import {
+  PieChart,
+  Pie,
+  Tooltip,
+  Cell,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
 
 interface Props {
   data: { category: string; total: number }[];
 }
 
-const COLORS = ["#1890ff", "#52c41a", "#faad14", "#f5222d", "#722ed1"];
+const COLORS = ["#1D6A6A", "#3B82F6", "#F59E0B", "#8B5CF6", "#EF4444"];
 
 export default function ExpenseCategoryChart({ data }: Props) {
+  if (!data.length) {
+    return (
+      <div className="h-48 flex items-center justify-center">
+        <p className="text-sm text-gray-400">No data to display</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full h-72">
+    <div className="w-full h-64">
       <ResponsiveContainer>
         <PieChart>
           <Pie
             data={data}
             dataKey="total"
             nameKey="category"
-            outerRadius={100}
-            label
+            cx="50%"
+            cy="50%"
+            innerRadius={55}
+            outerRadius={90}
+            paddingAngle={3}
           >
-            {data.map((entry, index) => (
-              <Cell key={index} fill={COLORS[index % COLORS.length]} />
+            {data.map((_, i) => (
+              <Cell key={i} fill={COLORS[i % COLORS.length]} />
             ))}
           </Pie>
-
-          <Tooltip />
+          <Tooltip
+            formatter={(value) => [Number(value).toFixed(2), "Total"]}
+            contentStyle={{
+              borderRadius: "8px",
+              border: "1px solid #E5E7EB",
+              fontSize: "12px",
+            }}
+          />
+          <Legend
+            iconType="circle"
+            iconSize={8}
+            formatter={(value) => (
+              <span className="text-xs text-gray-500">{value}</span>
+            )}
+          />
         </PieChart>
       </ResponsiveContainer>
     </div>

@@ -1,17 +1,16 @@
-import axios from "axios";
+export async function getExchangeRate(
+  from: string,
+  to: string,
+): Promise<number> {
+  if (from === to) return 1;
 
-export const getExchangeRate = async (
-  fromCurrency: string,
-  toCurrency: string,
-): Promise<number> => {
   try {
-    const response = await axios.get(
-      `https://api.exchangerate.host/convert?from=${fromCurrency}&to=${toCurrency}`,
-    );
+    const res = await fetch(`https://open.er-api.com/v6/latest/${from}`);
+    const data = await res.json();
 
-    return response.data.result;
+    return data?.rates?.[to] ?? 1;
   } catch (error) {
-    console.error("Error fetching exchange rate:", error);
+    console.error("Exchange rate fetch failed:", error);
     return 1;
   }
-};
+}

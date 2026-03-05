@@ -1,13 +1,9 @@
-import type { RootState } from "@/store/store";
-
-export const loadState = (): RootState | undefined => {
+export const loadState = (): Record<string, unknown> | undefined => {
   if (typeof window === "undefined") return undefined;
 
   try {
     const serializedState = localStorage.getItem("expenseManagerState");
-
     if (!serializedState) return undefined;
-
     return JSON.parse(serializedState);
   } catch (err) {
     console.error("Failed to load state", err);
@@ -15,12 +11,11 @@ export const loadState = (): RootState | undefined => {
   }
 };
 
-export const saveState = (state: RootState) => {
+export const saveState = (state: unknown) => {
   if (typeof window === "undefined") return;
 
   try {
-    const serializedState = JSON.stringify(state);
-    localStorage.setItem("expenseManagerState", serializedState);
+    localStorage.setItem("expenseManagerState", JSON.stringify(state));
   } catch (err) {
     console.error("Failed to save state", err);
   }

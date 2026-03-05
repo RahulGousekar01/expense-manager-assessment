@@ -1,41 +1,52 @@
 "use client";
 
-import { Layout, Menu } from "antd";
 import { useRouter, usePathname } from "next/navigation";
 
-const { Header, Content } = Layout;
+const navItems = [
+  { key: "/dashboard", label: "Dashboard" },
+  { key: "/subsidiaries", label: "Subsidiaries" },
+];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const menuItems = [
-    { key: "/dashboard", label: "Dashboard" },
-    { key: "/subsidiaries", label: "Subsidiaries" },
-  ];
-
-  const handleMenuClick = ({ key }: { key: string }) => {
-    router.push(key);
-  };
-
   return (
-    <Layout className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <Header className="bg-white shadow-sm px-6 flex items-center justify-between">
-        <h1 className="text-lg font-semibold text-blue-600">Expense Manager</h1>
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-white border-b border-gray-200 px-6 h-14 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded bg-teal flex items-center justify-center text-white text-xs font-bold">
+            ST
+          </div>
+          <span className="font-semibold text-gray-900 text-sm">
+            SpendTrack
+          </span>
+        </div>
 
-        <Menu
-          mode="horizontal"
-          selectedKeys={[pathname]}
-          items={menuItems}
-          onClick={handleMenuClick}
-        />
-      </Header>
+        <nav className="flex items-center gap-1">
+          {navItems.map((item) => {
+            const active = pathname === item.key;
+            return (
+              <button
+                key={item.key}
+                onClick={() => router.push(item.key)}
+                className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer
+                  ${
+                    active
+                      ? "bg-teal-light text-teal"
+                      : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+                  }`}
+              >
+                {item.label}
+              </button>
+            );
+          })}
+        </nav>
+      </header>
 
-      {/* Page Content */}
-      <Content className="p-6">
-        <div className="max-w-6xl mx-auto">{children}</div>
-      </Content>
-    </Layout>
+      <main className="p-6">
+        <div className="max-w-5xl mx-auto">{children}</div>
+      </main>
+    </div>
   );
 }
